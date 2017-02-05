@@ -1,9 +1,19 @@
 var sockFunc = require("../lib/customShit.js");
+var fs = require('fs');
 
+var weaponFolder = './db/weapons/';
+var weaponFiles = fs.readdirSync(weaponFolder);
+var weapons = {};
 
-var allWeapons = require("../db/allWeapons.json");
-var weaponIDs = require("../db/weaponIDs.json");
+for(i = 0; i < weaponFiles.length; i++){
+	var weapon = JSON.parse(fs.readFileSync(weaponFolder + weaponFiles[i], 'utf8'));
+	weapons[weapon.name] = weapon;
+}
 
+delete weaponFolder;
+delete weaponFiles;
+delete weapon;
+delete i;
 
 module.exports = {
 	information : {
@@ -24,17 +34,20 @@ module.exports = {
 			e.message.reply("please enter at least 3 characters.");
 			return;
 		}
+
+		var found = [];
+		for(var i = 0; i < Object.keys(weapons).length; i++){
+			var obj = weapons[Object.keys(weapons)[i]];
+			if(obj.name.toLowerCase() == e.args[0].toLowerCase() || obj.fullName.toLowerCase() == e.args[0].toLowerCase() || obj.wikiName.toLowerCase() == e.args[0].toLowerCase() || obj.image.toLowerCase() == e.args[0].toLowerCase())
+				found.push(obj);
+		}
 		
-		
-		var found = allWeapons.filter(function(obj){
-			return obj.Name.toLowerCase() == e.args[0].toLowerCase() || obj.MarketName.toLowerCase() == e.args[0].toLowerCase() || obj.Wiki.toLowerCase() == e.args[0].toLowerCase() || obj.Image.toLowerCase() == e.args[0].toLowerCase() || obj.VarN.toLowerCase() == e.args[0].toLowerCase()
-		});
-		
-		console.log(found);
 		if(found.length == 0)
-			found = allWeapons.filter(function(obj){
-				return obj.MarketName.toLowerCase().indexOf(e.args[0].toLowerCase()) > -1;
-			});
+			for(var i = 0; i < Object.keys(weapons).length; i++){
+				var obj = weapons[Object.keys(weapons)[i]];
+				if( obj.fullName.toLowerCase().indexOf(e.args[0].toLowerCase()) > -1)
+					found.push(obj);
+			};
 		
 		if(found.length == 0){
 			e.message.channel.sendMessage("Sorry, I couldn't find the weapon you meant.");
@@ -43,21 +56,20 @@ module.exports = {
 		
 		if(found.length == 1){
 			var statsText = "";
-			for(i=0;i<Object.keys(found[0].Stats).length;i++){
-				if(Object.keys(found[0].Stats)[i] != "slot")
-					statsText += "• " + Object.keys(found[0].Stats)[i] + ": " + found[0].Stats[Object.keys(found[0].Stats)[i]] + "\n"
+			for(i=0;i<Object.keys(found[0].stats).length;i++){
+				statsText += "• " + capitalize(Object.keys(found[0].stats)[i]) + ": " + found[0].stats[Object.keys(found[0].stats)[i]] + "\n"
 			}
 			var wikiText=  "";
-			if(found[0].Wiki){
-				wikiText = "**Wiki:** <http://payday.wikia.com/wiki/" + found[0].Wiki + ">\n"
+			if(found[0].wikiName){
+				wikiText = "**Wiki:** <http://payday.wikia.com/wiki/" + found[0].wikiName + ">\n"
 			}
-			e.message.channel.sendMessage("**" + found[0].MarketName + "**\n"+ wikiText+ "**STATS:**\n" + statsText);
+			e.message.channel.sendMessage("**" + found[0].fullName + "**\n"+ wikiText + "**STATS:**\n" + statsText);
 			return;
 		}
 		
 		var foundText = "";
 		for(i=0;i<found.length;i++){
-			foundText += "• " + found[i].Name + " (" + found[i].MarketName + ")" + "\n"
+			foundText += "• " + found[i].name + " (" + found[i].fullName + ")" + "\n"
 		}
 		e.message.channel.sendMessage("I found multiple matches to your search!\n" + foundText)
 		
@@ -68,3 +80,6 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function capitalize(str){
+	return str.substring(0,1).toUpperCase() + str.substring(1);
+}

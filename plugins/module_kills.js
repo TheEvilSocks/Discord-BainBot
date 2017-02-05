@@ -1,5 +1,4 @@
 var sockFunc = require("../lib/customShit.js");
-var gd = require("node-gd");
 var fs = require('fs');
 var http = require("follow-redirects").http;
 

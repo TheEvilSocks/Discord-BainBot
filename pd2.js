@@ -1,11 +1,11 @@
-process.chdir('../pd2');
+//process.chdir('../pd2');
 
 var auth = require("./config/auth.json");
 var config = require("./config/config.json");
-var userDB = require("./db/users.json");
+
+var groups = require("./db/bot/groups.json");
 
 var fs = require("fs");
-
 var ncp = require("ncp").ncp;
 var CronJob = require('cron').CronJob;
 var winston = require("winston");
@@ -87,7 +87,6 @@ var commands = {
 					e.message.channel.sendMessage("**INPUT**\n```javascript\n" + e.args.join(" ") + "```\n**OUTPUT**\n```javascript\n" + theEval + "```\n`Executed in: " + (new Date().getTime() - beforeEval.getTime()).toString() + "ms`");
 				} catch (err) {
 					e.message.channel.sendMessage("**INPUT**\n```javascript\n" + e.args.join(" ") + "```\n**OUTPUT**\n```diff\n-" + err.message + "```\n`Executed in: " + (new Date().getTime() - beforeEval.getTime()).toString() + "ms`");
-					//e.message.channel.sendMessage("```xl\ninput: " + e.message.content.split(" ").splice(2).join(" ") + "\noutput: " + err.message + "\nexecuted in: " + (new Date().getTime() - beforeEval.getTime()).toString() + "ms```");
 				}
 
 				return;
@@ -154,6 +153,7 @@ client.connect({
 
 client.Dispatcher.on(Events.GATEWAY_READY, function (e) {
 	logger.info("Connected as: " + client.User.username);
+	logger.info("Listening to prefix " + config.bot.prefix)
 	logger.info("Took " + (new Date().getTime() - startTime.getTime()) + "ms");
 	
 });
@@ -167,20 +167,14 @@ client.Dispatcher.on(Events.MESSAGE_CREATE, function (e) {
 function processNewMessage(e) {
 	if(!e.message.content.startsWith(config.bot.prefix))
 		return;
-
 	
-	var passedMessage = e.message.content.substring(1).split(" ");
+	var passedMessage = e.message.content.substring(config.bot.prefix.length).split(" ");
 	
 	if(!commands[passedMessage[0]])
 		return;
 
-	if(!userDB[e.message.author.id]){
-		userDB[e.message.author.id] = {
-			'groups':['default']
-		}
-		fs.writeFile("db/users.json", JSON.stringify(userDB).replace(/`/g, '\u200B`'));
-	}
-	var user = client.Users.get( e.message.author.id);
+	
+	var user = client.Users.get(e.message.author.id);
 	var channel = client.Channels.get(e.message.channel_id);
 	if (channel && !channel.is_private) {
 		var guild = client.Guilds.getBy("id", channel.guild_id);
@@ -220,27 +214,19 @@ function processNewMessage(e) {
 		if(!command.cooldowns[e.message.author.id]){
 			command.cooldowns[e.message.author.id] = 0;
 		}
-	
-		if((command.cooldowns[e.message.author.id] + command.cooldown <= (new Date()).getTime()) || isInGroup(e.message.author.id, 'root')){
-			if (command.permissions) {
-				if (command.permissions.groups) {
-					for (i = 0; i < command.permissions.groups.length; i++) {
-						if (isInGroup(e.message.author.id, command.permissions.groups[i])) {
-							executeCommand(command, e, user)
-							return;
-						}
-					}
 
-				} else {
-					executeCommand(command, e, user)
-					return;
-				}
-			} else {
-				executeCommand(command, e, user)
-				return;
-			}
+		var permissions = getPermissions(user.id);
+		console.log(permissions)
+		if((command.cooldowns[e.message.author.id] + (permissions.mastergroup.permissions.cooldowns[passedMessage[0]] || permissions.mastergroup.permissions.cooldowns["default"]) <= (new Date()).getTime())){
+			if(permissions.commands.indexOf(passedMessage[0]) > -1)
+				executeCommand(command, e, user, permissions.mastergroup)
 		}else{
-			e.message.reply("please wait " + parseFloat(((command.cooldowns[e.message.author.id] + command.cooldown)-(new Date()).getTime())/1000).toFixed(2) + " more seconds before using this command again.").then(msg=>setTimeout(function(){if(msg){msg.delete()}},30000));
+			e.message.reply("please wait " + 
+				parseFloat(((command.cooldowns[e.message.author.id] + command.cooldown) - (new Date()).getTime())/1000).toFixed(2) +
+				" more seconds before using this command again.").then(msg=>setTimeout(function(){
+					if(msg)
+						msg.delete()
+				},30000));
 		}
 	} else { //It's not a command we know
 		logger.error("Unknown command");
@@ -338,20 +324,20 @@ function loadModule(moduleName, moduleFilename, isAlias, aliasFor) {
 }
 
 var commandFiles = fs.readdirSync("./plugins/");
-for (i = 0; i < commandFiles.length; i++) {
-		if (commandFiles[i].substring(0, 7) == "module_" && commandFiles[i].substring(commandFiles[i].lastIndexOf(".")) == ".js") {
-			var currentModule = require("./plugins/" + commandFiles[i]);
-			if (currentModule.information && currentModule.information.moduleName) {
-				loadModule(currentModule.information.moduleName, "./plugins/" + commandFiles[i]);
-			} else {
-				loadModule(undefined, "./plugins/" + commandFiles[i]);
-			}
+for (var i = 0; i < commandFiles.length; i++) {
+	if (commandFiles[i].substring(0, 7) == "module_" && commandFiles[i].substring(commandFiles[i].lastIndexOf(".")) == ".js") {
+		var currentModule = require("./plugins/" + commandFiles[i]);
+		if (currentModule.information && currentModule.information.moduleName) {
+			loadModule(currentModule.information.moduleName, "./plugins/" + commandFiles[i]);
+		} else {
+			loadModule(undefined, "./plugins/" + commandFiles[i]);
 		}
+	}
 }
 
 function isInGroup(user, group) {
-	if (userDB[user]) {
-		return userDB[user].groups.indexOf(group) > -1;
+	if (groups[group]) {
+		return groups[group].members.indexOf(user) > -1;
 	} else {
 		return false;
 	}
@@ -372,13 +358,14 @@ function makeBackup() {
 	});
 }
 
-function executeCommand(command, e, user){
+function executeCommand(command, e, user, mastergroup){
 	GLOBAL.commands++;
 	e.GLOBAL = {
 		commands : commands,
 		config : config,
 		GLOBAL : GLOBAL
 	};
+	e.mastergroup = mastergroup;
 	command.cooldowns[e.message.author.id] = (new Date()).getTime();
 	command.action(client, e);
 	return;
@@ -400,3 +387,17 @@ function download(url, dest, cb) {
 		cb(err.message);
 	});
 };
+
+function getPermissions(user){
+	var response = {mastergroup: null,groups: [], commands: []};
+	for(var i = 0; i < Object.keys(groups).length; i++){
+		var group = groups[Object.keys(groups)[i]];
+		if(group && 'members' in group && group.members.indexOf(user) > -1 || group.isDefault){
+			response.groups.push(group);
+			response.commands = response.commands.concat(group.permissions.commands)
+			if(!response.mastergroup || ('hierarchy' in response.mastergroup && group.hierarchy > response.mastergroup.hierarchy))
+				response.mastergroup = group;
+		}
+	}
+	return response;
+}

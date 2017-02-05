@@ -12,7 +12,7 @@ module.exports = {
 	permissions : {
 		groups: ["default"]
 	},
-	aliases: ["tstats"],
+	//aliases: ["tstats"],
 	action : function (client, e) {
 		e.message.channel.sendTyping();
 		
@@ -38,6 +38,8 @@ module.exports = {
 				target = client.Users.getBy('username', e.args[0]);
 			if(client.Users.getBy('id', e.args[0]))
 				target = client.Users.getBy('id', e.args[0]);
+			if(e.args[0].indexOf("http://steamcommunity.com/profiles/") == 0)
+				target = {skip: true, steamID: e.args[0].substring(35)};
 			if(isMention && !client.Users.getBy('id', e.args[0])){
 				e.message.channel.sendMessage("That user was not found.");
 				return;
@@ -76,7 +78,7 @@ module.exports = {
 					
 							
 							e.message.channel.sendMessage("", false, {
-							  color: 0x3498db,
+							  color: parseInt(e.mastergroup.colour),
 							  author: {name: "Stats for " + info.profile.personaname, icon_url: info.profile.avatarmedium, url: "https://steamcommunity.com/profiles/" + info.profile.steamid},
 							  timestamp: (new Date().toISOString()),
 							  footer: {text: "Requested by " + e.message.author.username},
