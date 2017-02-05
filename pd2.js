@@ -101,9 +101,9 @@ var commands = {
 			description : "reload [command] - Reload a command"
 		},
 		action : function (client, e) {
-			var beforeReload = new Date();
 			if(!e.args[0]){
 				for(var i = 0; i < Object.keys(commands).length; i++){
+					var beforeReload = new Date();
 					var command = commands[Object.keys(commands)[i]];
 					if(!command.system){
 						try{
@@ -137,11 +137,11 @@ var commands = {
 				}catch(err){
 					logger.error(err);
 				}
-				/*
-				e.message.channel.sendMessage("**USAGE:**\n`" + commands.reload.description + "`");
-				return;*/
+				
+				e.message.channel.sendMessage("Reloaded!\nTook: " + ((new Date()).getTime() - beforeReload) + "ms");
 				return;
 			}
+			var beforeReload = new Date();
 			try{
 				if(require.resolve("./plugins/module_" + e.args[0].toLowerCase() + ".js")){
 					var location = require.resolve("./plugins/module_" + e.args[0].toLowerCase() + ".js");
@@ -379,11 +379,11 @@ function makeBackup() {
 		if(!err){
 			ncp('./db/', './backups/' + backupName,function(err){
 			if(err){
-				logger.error('Error creating backup\n' + err);
+				logger.error('Error1 creating backup\n' + err);
 			}
 			});
 		}else{
-			logger.error('Error creating backup\n' + err);
+			logger.error('Error2 creating backup\n' + err);
 		}
 	});
 }

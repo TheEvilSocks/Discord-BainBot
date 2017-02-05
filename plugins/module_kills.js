@@ -2,11 +2,7 @@ var sockFunc = require("../lib/customShit.js");
 var fs = require('fs');
 var http = require("follow-redirects").http;
 
-var secondaryList = require("../db/secondary.json");
-var primaryList = require("../db/primary.json");
-
-var weaponIDs = require("../db/weaponIDs.json");
-var enemies = require("../db/enemies.json");
+var enemies = require("../db/payday/enemies.json");
 
 
 module.exports = {

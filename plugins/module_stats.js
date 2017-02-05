@@ -89,9 +89,9 @@ module.exports = {
 							  	{name: "🤡Heister", value: info.heister.name, inline: true},
 								  
 								  
-								{name: "🔫Primary Weapon", value: info.primaryGun.MarketName + " (" + info.primaryGun.kills + ")", inline: true},
+								{name: "🔫Primary Weapon", value: info.primaryGun.fullName + " (" + info.primaryGun.kills + ")", inline: true},
 								empty,
-								{name: "🔫Secondary Gun", value: info.secondaryGun.MarketName + " (" + info.secondaryGun.kills + ")", inline: true}
+								{name: "🔫Secondary Gun", value: info.secondaryGun.fullName + " (" + info.secondaryGun.kills + ")", inline: true}
 							  ]
 							});
 							

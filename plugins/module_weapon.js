@@ -1,7 +1,7 @@
 var sockFunc = require("../lib/customShit.js");
 var fs = require('fs');
 
-var weaponFolder = './db/weapons/';
+var weaponFolder = './db/payday/weapons/';
 var weaponFiles = fs.readdirSync(weaponFolder);
 var weapons = {};
 
