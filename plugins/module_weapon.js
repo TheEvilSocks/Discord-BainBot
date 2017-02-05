@@ -17,12 +17,8 @@ delete i;
 
 module.exports = {
 	information : {
-		moduleName : "weapon"
-	},
-	cooldown : 1000,
-	description : "!weapon <weapon> - Shows information about a weapon",
-	permissions : {
-		groups: ["default"]
+		moduleName : "weapon",
+		description : "!weapon <weapon> - Shows information about a weapon"
 	},
 	action : function (client, e) {
 		if(!e.args[0]){

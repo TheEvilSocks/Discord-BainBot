@@ -5,14 +5,9 @@ var empty = {name: "\u200B", value: "\u200B",inline:true};
 
 module.exports = {
 	information : {
-		moduleName : "stats"
+		moduleName : "stats",
+		description : "!stats [user] - Shows the Payday 2 stats for this user."
 	},
-	cooldown : 10000,
-	description : "!stats [user] - Shows the Payday 2 stats for this user.",
-	permissions : {
-		groups: ["default"]
-	},
-	//aliases: ["tstats"],
 	action : function (client, e) {
 		e.message.channel.sendTyping();
 		

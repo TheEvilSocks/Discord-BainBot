@@ -11,12 +11,8 @@ var enemies = require("../db/enemies.json");
 
 module.exports = {
 	information : {
-		moduleName : "kills"
-	},
-	cooldown : 1000,
-	description : "!kills [user] - Shows the amount of kills for each unit",
-	permissions : {
-		groups: ["default"]
+		moduleName : "kills",
+		description : "!kills [user] - Shows the amount of kills for each unit"
 	},
 	action : function (client, e) {
 		e.message.channel.sendTyping();

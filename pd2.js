@@ -73,12 +73,11 @@ var client = new Discordie();
 
 var commands = {
 	eval : {
-		hide: true,
-		cooldown : 500,
-		description : "eval <code> - Evaluate your code",
-		permissions : {
-			groups: ["root"]
+		system: true,
+		information: {
+			description : "eval <code> - Evaluate your code"
 		},
+		hide: true,
 		action : function (client, e) {
 			if (e.message.author.id == config.bot.master) {
 				var beforeEval = new Date();
@@ -96,18 +95,53 @@ var commands = {
 		}
 	},
 	reload : {
+		system: true,
 		hide: true,
-		cooldown : 500,
-		description : "reload <command> - Reload a command",
-		permissions : {
-			groups : ["root"]
+		information:{
+			description : "reload [command] - Reload a command"
 		},
 		action : function (client, e) {
+			var beforeReload = new Date();
 			if(!e.args[0]){
+				for(var i = 0; i < Object.keys(commands).length; i++){
+					var command = commands[Object.keys(commands)[i]];
+					if(!command.system){
+						try{
+							if(require.resolve("./plugins/module_" + Object.keys(commands)[i] + ".js")){
+								var location = require.resolve("./plugins/module_" + Object.keys(commands)[i] + ".js");
+								delete require.cache[location]; 
+								loadModule(Object.keys(commands)[i], "./plugins/module_" + Object.keys(commands)[i] + ".js");
+								logger.info("Successfully reloaded `" + Object.keys(commands)[i] + "`!\nTook: " + ((new Date()).getTime() - beforeReload) + "ms");
+							}else{
+								logger.error("Cache for command " + Object.keys(commands)[i] + " not found. Reloading failed.");
+							}
+						}catch(err){
+							logger.error(err);
+						}
+					}
+				}
+				try{
+					var configLocation = require.resolve("./config/config.json");
+					var groupsLocation = require.resolve("./db/bot/groups.json");
+					if(configLocation){
+						delete require.cache[configLocation];
+						config = require("./config/config.json");
+						logger.info("Reloaded config");
+					}
+					if(groupsLocation){
+						delete require.cache[groupsLocation];
+						groups = require("./db/bot/groups.json");
+						logger.info("Reloaded groups");
+					}
+
+				}catch(err){
+					logger.error(err);
+				}
+				/*
 				e.message.channel.sendMessage("**USAGE:**\n`" + commands.reload.description + "`");
+				return;*/
 				return;
 			}
-			var beforeReload = new Date();
 			try{
 				if(require.resolve("./plugins/module_" + e.args[0].toLowerCase() + ".js")){
 					var location = require.resolve("./plugins/module_" + e.args[0].toLowerCase() + ".js");
@@ -123,11 +157,10 @@ var commands = {
 		}
 	},
 	load : {
+		system: true,
 		hide: true,
-		cooldown : 500,
-		description : "load <command> - Load a new command",
-		permissions : {
-			groups : ["root"]
+		information: {
+			description : "load <command> - Load a new command"
 		},
 		action : function (client, e) {
 			if(!e.args[0]){
@@ -216,20 +249,17 @@ function processNewMessage(e) {
 		}
 
 		var permissions = getPermissions(user.id);
-		console.log(permissions)
 		if((command.cooldowns[e.message.author.id] + (permissions.mastergroup.permissions.cooldowns[passedMessage[0]] || permissions.mastergroup.permissions.cooldowns["default"]) <= (new Date()).getTime())){
 			if(permissions.commands.indexOf(passedMessage[0]) > -1)
 				executeCommand(command, e, user, permissions.mastergroup)
 		}else{
 			e.message.reply("please wait " + 
-				parseFloat(((command.cooldowns[e.message.author.id] + command.cooldown) - (new Date()).getTime())/1000).toFixed(2) +
-				" more seconds before using this command again.").then(msg=>setTimeout(function(){
-					if(msg)
-						msg.delete()
-				},30000));
+			parseFloat(((command.cooldowns[e.message.author.id] + command.cooldown) - (new Date()).getTime())/1000).toFixed(2) +
+			" more seconds before using this command again.").then(msg=>setTimeout(function(){
+				if(msg)
+					msg.delete()
+			},30000));
 		}
-	} else { //It's not a command we know
-		logger.error("Unknown command");
 	}
 }
 
@@ -367,7 +397,7 @@ function executeCommand(command, e, user, mastergroup){
 	};
 	e.mastergroup = mastergroup;
 	command.cooldowns[e.message.author.id] = (new Date()).getTime();
-	command.action(client, e);
+	command.action(client, e, logger);
 	return;
 }
 

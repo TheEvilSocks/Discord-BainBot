@@ -4,13 +4,8 @@ var fs = require('fs');
 
 module.exports = {
 	information : {
-		moduleName : "debug"
-	},
-	lastTime : 0,
-	cooldown : 500,
-	description : "debug - Shows debug information about the bot",
-	permissions : {
-		groups : ["root"]
+		moduleName : "debug",
+		description : "debug - Shows debug information about the bot"
 	},
 	hide: true,
 	action : function (client, e) {

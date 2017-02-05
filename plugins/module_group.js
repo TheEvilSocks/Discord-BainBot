@@ -1,21 +1,16 @@
 var fs = require('fs');
-var userDB = require("../db/users.json");
 
 module.exports = {
 	information : {
-		moduleName : "group"
-	},
-	cooldown : 500,
-	description : "group add <group> <user> - Adds a user to a group",
-	permissions : {
-		groups : ["root"]
+		moduleName : "group",
+		description : "group add <group> <user> - Adds a user to a group"
 	},
 	hide: true,
 	action : function (client, e) {
 		if (client.Channels.getBy('id', e.message.channel_id)) {
 
 			if(!e.args[0] || !e.args[1] || !e.args[2]){
-				e.message.reply('**USAGE**\n' + module.exports.description);
+				e.message.reply('**USAGE**\n' + module.exports.information.description);
 				return;
 			}
 			e.args[2] = e.args.splice(2).join(" ");

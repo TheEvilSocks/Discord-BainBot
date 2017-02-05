@@ -3,12 +3,9 @@ var fs = require("fs");
 
 module.exports = {
 	information : {
-		moduleName : "suggest"
+		moduleName : "suggest",
+		description : "!suggest <suggestion> - Suggest a feature"
 	},
-	lastTime : 0,
-	cooldown : 3000,
-	description : "!suggest <suggestion> - Suggest a feature",
-	permissions : {},
 	action : function (client, e) {
 		e.args[0] = e.args.join(" ");
 		

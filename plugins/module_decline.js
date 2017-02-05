@@ -3,15 +3,10 @@ var fs = require("fs");
 
 module.exports = {
 	information : {
-		moduleName : "decline"
+		moduleName : "decline",
+		description : "!decline <suggestion> <Information> - Decline a suggested feature"
 	},
-	lastTime : 0,
-	cooldown : 3000,
 	hide: true,
-	description : "!decline <suggestion> <Information> - Suggest a feature",
-	permissions : {
-		groups: ["root"]
-	},
 	action : function (client, e) {
 		e.args[1] = e.args.splice(1).join(" ");
 		

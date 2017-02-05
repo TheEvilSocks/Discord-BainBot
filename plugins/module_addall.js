@@ -2,15 +2,10 @@ var fs = require('fs');
 
 module.exports = {
 	information : {
-		moduleName : "addall"
+		moduleName : "addall",
+		description : "!addall - Shows all commands."
 	},
-	lastTime : 0,
-	cooldown : 1000,
-	description : "!addall - Shows all commands.",
 	hide: true,
-	permissions : {
-		groups: ["root"]
-	},
 	action : function (client, e) {
 		try{
 			var oldweapons = JSON.parse(fs.readFileSync('./db/allWeapons.json', 'utf8'));
