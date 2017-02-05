@@ -374,16 +374,17 @@ function isInGroup(user, group) {
 }
 
 function makeBackup() {
-	var backupName = (new Date()).toLocaleString('nl-NL').replace(/\//g, '-');
+	var now = new Date();
+	var backupName = now.getDate() + "-" + (now.getMonth()+1) + "-" + (now.getFullYear()) + " " + now.getHours() + "_" + now.getMinutes() + "_" + now.getSeconds()
 	fs.mkdir('./backups/' + backupName, function(err,res){
 		if(!err){
 			ncp('./db/', './backups/' + backupName,function(err){
-			if(err){
-				logger.error('Error1 creating backup\n' + err);
-			}
+				if(err){
+					logger.error('Error creating backup\n' + err);
+				}
 			});
 		}else{
-			logger.error('Error2 creating backup\n' + err);
+			logger.error('Error creating backup folder\n' + err);
 		}
 	});
 }
