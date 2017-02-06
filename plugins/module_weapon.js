@@ -5,15 +5,6 @@ var weaponFolder = './db/payday/weapons/';
 var weaponFiles = fs.readdirSync(weaponFolder);
 var weapons = {};
 
-for(i = 0; i < weaponFiles.length; i++){
-	var weapon = JSON.parse(fs.readFileSync(weaponFolder + weaponFiles[i], 'utf8'));
-	weapons[weapon.name] = weapon;
-}
-
-delete weaponFolder;
-delete weaponFiles;
-delete weapon;
-delete i;
 
 module.exports = {
 	information : {
@@ -69,6 +60,17 @@ module.exports = {
 		}
 		e.message.channel.sendMessage("I found multiple matches to your search!\n" + foundText)
 		
+	},
+	reload: function(){
+		for(i = 0; i < weaponFiles.length; i++){
+			var weapon = JSON.parse(fs.readFileSync(weaponFolder + weaponFiles[i], 'utf8'));
+			weapons[weapon.name] = weapon;
+		}
+
+		delete weaponFolder;
+		delete weaponFiles;
+		delete weapon;
+		delete i;
 	}
 }
 

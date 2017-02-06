@@ -28,6 +28,8 @@ module.exports = {
 						delete weapon;
 						delete i;
 						rmDir("./plugins/cache/git");
+						if('weapon' in e.GLOBAL.commands)
+							e.GLOBAL.commands.weapon.reload()
 					}
 				});
 
