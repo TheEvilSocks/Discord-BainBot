@@ -5,7 +5,6 @@ var weaponFolder = './db/payday/weapons/';
 var weaponFiles = fs.readdirSync(weaponFolder);
 var weapons = {};
 
-
 module.exports = {
 	information : {
 		moduleName : "weapon",
@@ -62,6 +61,9 @@ module.exports = {
 		
 	},
 	reload: function(){
+		module.exports.initialize();
+	},
+	initialize: function(){
 		for(i = 0; i < weaponFiles.length; i++){
 			var weapon = JSON.parse(fs.readFileSync(weaponFolder + weaponFiles[i], 'utf8'));
 			weapons[weapon.name] = weapon;

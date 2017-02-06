@@ -335,6 +335,8 @@ function loadModule(moduleName, moduleFilename, isAlias, aliasFor) {
 		}
 
 		commands[moduleName] = require(moduleFilename);
+		if('initialize' in commands[moduleName])
+			commands[moduleName].initialize();
 		if(isAlias){
 			delete commands[moduleName].aliases;
 			commands[moduleName].isAlias = true;
