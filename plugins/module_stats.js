@@ -8,7 +8,7 @@ module.exports = {
 		moduleName : "stats",
 		description : "!stats [user] - Shows the Payday 2 stats for this user."
 	},
-	action : function (client, e) {
+	action : function (client, e, logger) {
 		e.message.channel.sendTyping();
 		
 		if(e.message.channel.guild_id == "181079451986165760" && e.message.channel.id != "236570048393773058"){
@@ -46,9 +46,18 @@ module.exports = {
 			e.message.channel.sendMessage("That user was not found.");
 			return;
 		}
+
+		if(target.bot){
+			e.message.channel.sendMessage("User is a bot user.");
+			return;
+		}
+
+
+
 		sockFunc.getProfile(target.id, function(err, res){
 			if(err || res.code){
 				e.message.channel.sendMessage("Something went wrong. This is probable due to the bot not being setup correctly on this server.\n\nHave a server administrator contact <@132842210231189504>");
+				logger.error(err || res.code);
 				return;
 			}
 			

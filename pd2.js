@@ -89,8 +89,6 @@ var commands = {
 				}
 
 				return;
-			} else {
-				e.message.reply("only <@" + config.bot.master + "> can use this command!")
 			}
 		}
 	},
@@ -254,7 +252,7 @@ function processNewMessage(e) {
 				executeCommand(command, e, user, permissions.mastergroup)
 		}else{
 			e.message.reply("please wait " + 
-			parseFloat(((command.cooldowns[e.message.author.id] + command.cooldown) - (new Date()).getTime())/1000).toFixed(2) +
+			parseFloat(((command.cooldowns[e.message.author.id] + (permissions.mastergroup.permissions.cooldowns[passedMessage[0]] || permissions.mastergroup.permissions.cooldowns["default"])) - (new Date()).getTime()) / 1000).toFixed(2) +
 			" more seconds before using this command again.").then(msg=>setTimeout(function(){
 				if(msg)
 					msg.delete()
@@ -262,6 +260,7 @@ function processNewMessage(e) {
 		}
 	}
 }
+
 
 client.Dispatcher.on(Discordie.Events.DISCONNECTED, function (e) {
 	const delay = 5000;
