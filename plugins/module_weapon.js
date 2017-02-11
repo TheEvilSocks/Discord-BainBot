@@ -12,7 +12,7 @@ module.exports = {
 	},
 	action : function (client, e) {
 		if(!e.args[0]){
-			e.message.reply("**USAGE:**\n`" + module.exports.description + "`");
+			e.message.reply("**USAGE:**\n`" + module.exports.information.description + "`");
 			return;
 		}
 		e.args[0] = e.args.join(" ");

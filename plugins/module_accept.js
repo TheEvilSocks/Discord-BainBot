@@ -11,7 +11,7 @@ module.exports = {
 		e.args[1] = e.args.splice(1).join(" ");
 		
 		if(!e.args[0] || !e.args[1]){
-			e.message.reply("**USAGE:**\n`" + module.exports.description + "`");
+			e.message.reply("**USAGE:**\n`" + module.exports.information.description + "`");
 			return;
 		}
 		

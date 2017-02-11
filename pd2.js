@@ -186,7 +186,6 @@ client.Dispatcher.on(Events.GATEWAY_READY, function (e) {
 	logger.info("Connected as: " + client.User.username);
 	logger.info("Listening to prefix " + config.bot.prefix)
 	logger.info("Took " + (new Date().getTime() - startTime.getTime()) + "ms");
-	
 });
 
 
@@ -204,7 +203,6 @@ function processNewMessage(e) {
 	if(!commands[passedMessage[0]])
 		return;
 
-	
 	var user = client.Users.get(e.message.author.id);
 	var channel = client.Channels.get(e.message.channel_id);
 	if (channel && !channel.is_private) {
@@ -217,6 +215,7 @@ function processNewMessage(e) {
 			name : "PM"
 		};
 	}
+
 	logger.info("----------------");
 	logger.info("[" + new Date().toLocaleDateString("nl-NL") + " " + new Date().toLocaleTimeString("en-GB", {
 		hour12 : false
@@ -264,8 +263,7 @@ function processNewMessage(e) {
 
 client.Dispatcher.on(Discordie.Events.DISCONNECTED, function (e) {
 	const delay = 5000;
-	const sdelay = Math.floor(delay / 100) / 10;
-
+	const sdelay = Math.floor(delay / 1000).toFixed(2);
 	if (e.error.message.indexOf("gateway") >= 0) {
 		logger.error("Disconnected from gw, resuming in " + sdelay + " seconds");
 	} else {
