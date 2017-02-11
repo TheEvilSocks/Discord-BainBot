@@ -12,7 +12,7 @@ module.exports = {
 			if(err && err.code == "ENOENT"){ // This is what we want. We dont want the git folder already existing.
 
 				git.Clone("https://github.com/TheEvilSocks/Discord-Bain", "./plugins/cache/git").then(function(repo){
-					var weaponFolder = './plugins/cache/git/weapons/';
+					var weaponFolder = './plugins/cache/git/Weapons/';
 					var weaponFiles = fs.readdirSync(weaponFolder);
 					var weapons = {};
 
