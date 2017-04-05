@@ -1,0 +1,9 @@
+{
+    "bot": {
+        "prefix": "p!",
+        "master": "YOUR_DISCORD_ID_HERE"
+    },
+    "discord": {
+        "name": "Payday 2 Bot"
+    }
+}

@@ -1,0 +1,11 @@
+{
+	"discord" : {
+		"token": "DISCORD_TOKEN_HERE"
+	},
+	"slave": {
+		"discord": {
+			"token": "SLAVE_TOKEN_HERE"
+		}
+	},
+	"steam": "STEAM_API_KEY_HERE"
+}
