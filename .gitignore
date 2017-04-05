@@ -65,3 +65,4 @@ cache
 plugins/old
 db
 backups
+config/config.json
