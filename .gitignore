@@ -66,3 +66,5 @@ plugins/old
 db
 backups
 config/config.json
+plugins/Push to VPS.bat
+plugins/pscp.exe
