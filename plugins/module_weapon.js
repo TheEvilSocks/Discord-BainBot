@@ -24,7 +24,7 @@ module.exports = {
 		var found = [];
 		for(var i = 0; i < Object.keys(weapons).length; i++){
 			var obj = weapons[Object.keys(weapons)[i]];
-			if(obj.name.toLowerCase() == e.args[0].toLowerCase() || obj.fullName.toLowerCase() == e.args[0].toLowerCase() || obj.wikiName.toLowerCase() == e.args[0].toLowerCase() || obj.image.toLowerCase() == e.args[0].toLowerCase())
+			if(obj.name.toLowerCase() == e.args[0].toLowerCase() || obj.fullName.toLowerCase() == e.args[0].toLowerCase() || obj.image.toLowerCase() == e.args[0].toLowerCase())
 				found.push(obj);
 		}
 		
@@ -41,16 +41,32 @@ module.exports = {
 		}
 		
 		if(found.length == 1){
-			var statsText = "";
-			for(i=0;i<Object.keys(found[0].stats).length;i++){
-				statsText += "• " + capitalize(Object.keys(found[0].stats)[i]) + ": " + found[0].stats[Object.keys(found[0].stats)[i]] + "\n"
+
+			var fields = [];
+
+			if(found[0].cost)
+				fields.push({name: "Cost",value: found[0].cost});
+			fields.push({name: "__STATS__",value: "\u200B"});
+
+			for(let i = 0; i < Object.keys(found[0].stats).length; i++){
+				fields.push({
+					name: capitalize(Object.keys(found[0].stats)[i]),
+					value: found[0].stats[Object.keys(found[0].stats)[i]].toString(),
+					inline:true
+				});
 			}
-			var wikiText=  "";
-			if(found[0].wikiName){
-				wikiText = "**Wiki:** <http://payday.wikia.com/wiki/" + found[0].wikiName + ">\n"
-			}
-			e.message.channel.sendMessage("**" + found[0].fullName + "**\n"+ wikiText + "**STATS:**\n" + statsText);
-			return;
+
+			var embed = {
+				title: found[0].fullName,
+				fields: fields,
+				image: {
+					url: "http://fbi.overkillsoftware.com/img/weapons/ranged/thumbs/" + found[0].image + ".png" 
+				}
+			};
+			console.log(embed);
+			e.message.channel.sendMessage("", false, embed);
+
+			return
 		}
 		
 		var foundText = "";
@@ -68,11 +84,6 @@ module.exports = {
 			var weapon = JSON.parse(fs.readFileSync(weaponFolder + weaponFiles[i], 'utf8'));
 			weapons[weapon.name] = weapon;
 		}
-
-		delete weaponFolder;
-		delete weaponFiles;
-		delete weapon;
-		delete i;
 	}
 }
 
