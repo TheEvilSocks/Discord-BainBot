@@ -227,6 +227,14 @@ function processNewMessage(e) {
 	e.args = passedMessage.splice(1);
 
 	if (commands[passedMessage[0]]) {
+
+		if(e.message.channel.guild_id == "181079451986165760" && e.message.channel.id != "236570048393773058"){
+			e.message.channel.sendMessage("Please use this command in <#236570048393773058>.").then(function(msg){
+				setTimeout(function(){if(msg){msg.delete()}}, 15000);
+			});
+			return;
+		}
+		
 		if(isInGroup(user.id, 'banned')){
 			if(!GLOBAL.lastBanWarn[user.id])
 				GLOBAL.lastBanWarn[user.id] = 0;
