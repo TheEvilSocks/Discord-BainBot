@@ -48,7 +48,7 @@ module.exports = {
 		}
 
 		if(target.bot){
-			e.message.channel.sendMessage("User is a bot user.");
+			e.message.channel.sendMessage("Bot users don't have stats!");
 			return;
 		}
 
@@ -68,6 +68,10 @@ module.exports = {
 					payday.getAllInfo(steamAccount).then(function(info){
 						try{
 							games = info.games.response.games;
+							if(!games){
+								e.message.channel.sendMessage("No games were found on this steam accounts.");
+								return;
+							}
 							var playtime = ""
 							if(!info.isShared){
 								if(games.filter(g=>g.appid == 218620)[0]){
@@ -89,7 +93,7 @@ module.exports = {
 							  fields: [
 							  
 								{name: (info.isShared ? "👪Family Shared" : "🕙Total Playtime"), value: (info.isShared ? "\u200B" : playtime), inline: true},
-								{name: "🏆Achievements", value: numberWithCommas(info.payday.achievements.length), inline: true},
+								{name: "🏆Achievements", value: (info.payday.achievements ? numberWithCommas(info.payday.achievements.length) : 0), inline: true},
 								{name: "🥇Level", value: (info.infamy > 0 ? "**\\\u2660**" + infamyList[info.infamy-1] + "-" : "") + info.level, inline: true},
 						
 						
@@ -127,7 +131,7 @@ module.exports = {
 								e.message.channel.sendMessage("Profile not found.");
 								break;
 							default: 
-								e.message.channel.sendMessage("Something went wrong. (Error " + err + ")");
+								e.message.channel.sendMessage("Something went wrong. (" + err + ")");
 								break;
 						}
 					});

@@ -55,15 +55,13 @@ module.exports = {
 					inline:true
 				});
 			}
-
 			var embed = {
 				title: found[0].fullName,
 				fields: fields,
 				image: {
-					url: "http://fbi.overkillsoftware.com/img/weapons/ranged/thumbs/" + found[0].image + ".png" 
+					url: "http://fbi.overkillsoftware.com/img/weapons/" + (found[0].legendary ? "legendary" : "ranged") + "/thumb" + (found[0].legendary ? "" : "s") + "/" + found[0].image + ".png" 
 				}
 			};
-			console.log(embed);
 			e.message.channel.sendMessage("", false, embed);
 
 			return
