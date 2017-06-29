@@ -15,7 +15,7 @@ var slave = require("./lib/slave.js");
 /*-----------------------------------------------*/
 /* CRON JOBS */
 var dbBackupJob = new CronJob({
-		cronTime : '*/30 * * * *',
+		cronTime : '0 */1 * * *',
 		onTick : function () {
 		makeBackup();
 	},
@@ -28,6 +28,15 @@ var dbBackupJob = new CronJob({
 /*-----------------------------------------------*/
 
 
+const mysql = require('mysql');
+var connection = mysql.createConnection({
+	host     : auth.mysql.host,
+	port     : auth.mysql.port,
+	user     : auth.mysql.username,
+	password : auth.mysql.password,
+	database : auth.mysql.database
+});
+connection.connect();
 
 var GLOBAL = {
 	commands : 0,
@@ -89,6 +98,37 @@ var commands = {
 				}
 
 				return;
+			}
+		}
+	},
+	setactive : {
+		system: true,
+		information: {
+			description : "setactive <messages> - Sets the new total messages amount to gain the active role."
+		},
+		hide: true,
+		action : function (client, e) {
+			if(e.message.channel.isGuildText && (e.message.channel.guild.id == "181079451986165760" || e.message.author.id == config.bot.master)){
+				if((e.message.member.roles.filter(r=>r.id == '181079776935673856').length > 0) || e.message.author.id == config.bot.master){
+					if(!e.args[0] || parseInt(e.args[0]) != e.args[0]){
+						e.message.channel.sendMessage("Please enter a message amount.");
+						return;
+					}
+
+					connection.query("UPDATE pd2_guildsettings SET activeMsg = ?", [e.args[0]], function(err, rows){
+						if(err){
+							e.message.channel.sendMessage("Something went wrong! The bot owner has been informed.");
+							client.Users.get(config.bot.master).openDM().then(chan=>{
+								chan.sendMessage("Something went wrong when " + e.message.author.mention + " tried to update the active message count!\n```js\n" + err.stack + "```\n```js" + err + "```");
+							});
+							return;
+						}else{
+							e.message.channel.sendMessage("The amount of messages required to get the active role has been updated to **" + parseInt(e.args[0]).toString() + "**.");
+							return;
+						}
+					});
+
+				}
 			}
 		}
 	},
@@ -192,6 +232,9 @@ client.Dispatcher.on(Events.GATEWAY_READY, function (e) {
 
 client.Dispatcher.on(Events.MESSAGE_CREATE, function (e) {
 	processNewMessage(e);
+	if(e.message.channel.isGuildText && e.message.channel.guild.id == "181079451986165760"){
+		processActive(e);
+	}
 });
 
 function processNewMessage(e) {
@@ -438,4 +481,33 @@ function getPermissions(user){
 		}
 	}
 	return response;
+}
+
+
+
+function processActive(e){
+	if(e.message.member && e.message.member.roles.filter(r=>r.id == "234099668450148353").length == 0){
+		connection.query("INSERT IGNORE INTO pd2_active (`did`, `messages`) VALUES (?,  '0');", [e.message.author.id], function(err, rows){
+			if(err){
+				logger.error(err);
+				return;
+			}
+			connection.query("UPDATE pd2_active SET messages = messages + 1 WHERE did = ?;", [e.message.author.id], function(err, rows){
+				if(err){
+					logger.error(err);
+					return;
+				}
+				connection.query("SELECT if(pd2_active.messages >= pd2_guildsettings.activeMsg, 1, 0) AS shouldAssign FROM pd2_active, pd2_guildsettings WHERE pd2_active.did = ? AND pd2_guildsettings.gid = ?;", [e.message.author.id, e.message.guild.id], function(err, rows){
+					if(err){
+						logger.error(err);
+						return;
+					}
+					if(rows[0].shouldAssign){
+						e.message.member.assignRole("234099668450148353");
+					}
+				});
+
+			});
+		});
+	}
 }

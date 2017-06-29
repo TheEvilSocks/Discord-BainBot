@@ -16,8 +16,8 @@ module.exports = {
 			return;
 		}
 		e.args[0] = e.args.join(" ");
-		if(e.args[0].length < 3){
-			e.message.reply("please enter at least 3 characters.");
+		if(e.args[0].length < 2){
+			e.message.reply("please enter at least 2 characters.");
 			return;
 		}
 
@@ -43,23 +43,22 @@ module.exports = {
 		if(found.length == 1){
 
 			var fields = [];
-
-			if(found[0].cost)
-				fields.push({name: "Cost",value: found[0].cost});
 			fields.push({name: "__STATS__",value: "\u200B"});
 
 			for(let i = 0; i < Object.keys(found[0].stats).length; i++){
 				fields.push({
 					name: capitalize(Object.keys(found[0].stats)[i]),
 					value: found[0].stats[Object.keys(found[0].stats)[i]].toString(),
-					inline:true
+					inline: true
 				});
 			}
 			var embed = {
 				title: found[0].fullName,
 				fields: fields,
 				image: {
-					url: "http://fbi.overkillsoftware.com/img/weapons/" + (found[0].legendary ? "legendary" : "ranged") + "/thumb" + (found[0].legendary ? "" : "s") + "/" + found[0].image + ".png" 
+					url: "http://fbi.overkillsoftware.com/img/weapons/" + (found[0].legendary ? "legendary" : "ranged") + "/thumb" + (found[0].legendary ? "" : "s") + "/" + found[0].image + ".png",
+					width: 1303,
+					height: 801
 				}
 			};
 			e.message.channel.sendMessage("", false, embed);
