@@ -3,7 +3,7 @@ module.exports = {
 		moduleName : "lookingtoplay",
 		description : "lookingtoplay - If you're currently looking to play some games."
 	},
-	aliases: ['lfg'],
+	aliases: ['lfg', 'ltp', 'lookingforgame'],
 	action : function (client, e) {
 
 		if(!e.message.channel.isPrivate && e.message.channel.guild.id == "181079451986165760"){

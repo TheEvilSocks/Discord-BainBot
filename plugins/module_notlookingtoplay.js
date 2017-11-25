@@ -3,7 +3,7 @@ module.exports = {
 		moduleName : "notlookingtoplay",
 		description : "notlookingtoplay - You're no longer looking for a game."
 	},
-	aliases: ['nlfg'],
+	aliases: ['nlfg', 'nltp', 'notlookingforgame'],
 	action : function (client, e) {
 
 		if(!e.message.channel.isPrivate && e.message.channel.guild.id == "181079451986165760"){
