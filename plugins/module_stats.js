@@ -56,7 +56,7 @@ module.exports = {
 
 		sockFunc.getProfile(target.id, function(err, res){
 			if(err || res.code){
-				e.message.channel.sendMessage("Something went wrong. This is probable due to the bot not being setup correctly on this server.\n\nHave a server administrator contact <@132842210231189504>");
+				e.message.channel.sendMessage("Something went wrong. This is probable due to the bot not being setup correctly on this server.\n\nHave a server administrator contact <@132842210231189504> (`TheEvilSocks#0023`)");
 				logger.error(err || res.code);
 				return;
 			}
