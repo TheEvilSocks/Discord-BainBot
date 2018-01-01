@@ -9,12 +9,13 @@
   "author": "TheEvilSocks",
   "license": "MIT",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "cron": "^1.2.1",
     "discordie": "github:qeled/discordie",
     "follow-redirects": "0.0.7",
     "md5": "^2.2.1",
+    "mysql": "^2.14.1",
     "ncp": "^2.0.0",
-    "nodegit": "^0.16.0",
     "request": "^2.79.0",
     "winston": "^2.3.1"
   }
