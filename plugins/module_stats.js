@@ -24,7 +24,7 @@ module.exports = {
 		if(e.args[0]){
 			if (e.args[0] && e.args[0].match(/<@!?([0-9]+)>/) != null) {
 				if (e.args[0].match(/<@!?([0-9]+)>/)[1] == parseInt(e.args[0].match(/<@!?([0-9]+)>/)[1])) {
-					e.args[0] =  e.args[0].match(/<@!?([0-9]+)>/)[1].toString();
+					e.args[0] =	e.args[0].match(/<@!?([0-9]+)>/)[1].toString();
 					isMention = true;
 				}
 			}
@@ -47,8 +47,43 @@ module.exports = {
 			return;
 		}
 
-		if(target.bot){
+		if(target.bot && target.id !== client.User.id){
 			e.message.channel.sendMessage("Bot users don't have stats!");
+			return;
+		}
+
+		if(target.id == client.User.id){
+			var timeSinceLaunch = (new Date().getTime() - new Date("March 20 2013 07:42:32 UTC").getTime()) / (60*1000);
+
+			var playtime = numberWithCommas(Math.floor(timeSinceLaunch / 60)) + " hours";
+			if(timeSinceLaunch % 60 > 0)
+				playtime += " and " + Math.floor((timeSinceLaunch) % 60) + " minutes"
+			
+
+
+			e.message.channel.sendMessage("", false, {
+				color: parseInt(e.mastergroup.colour),
+				author: {name: "Stats for " + client.User.username, icon_url: client.User.avatarURL},
+				timestamp: (new Date().toISOString()),
+				footer: {text: "Requested by " + e.message.author.username},
+				fields: 
+					[
+				
+					{name: "🕙Total Playtime", value: playtime, inline: true},
+					{name: "🏆Achievements", value: "All of them", inline: true},
+					{name: "🥇Level", value: "**\\\u2660**C-100", inline: true},
+
+
+					{name: "☠Total Kills", value: numberWithCommas(Math.floor(timeSinceLaunch / 23)), inline: true},
+					{name: "💰Heists Completed", value: numberWithCommas(Math.floor(timeSinceLaunch / 48.45)), inline: true},
+					{name: "🤡Heister", value: "Payday Gang", inline: true},
+
+
+					{name: "🔫Primary Weapon", value: "Microphone", inline: true},
+					empty,
+					{name: "🔫Secondary Gun", value: "Crime.net", inline: true}
+				]
+			});
 			return;
 		}
 
@@ -86,26 +121,26 @@ module.exports = {
 					
 							
 							e.message.channel.sendMessage("", false, {
-							  color: parseInt(e.mastergroup.colour),
-							  author: {name: "Stats for " + info.profile.personaname, icon_url: info.profile.avatarmedium, url: "https://steamcommunity.com/profiles/" + info.profile.steamid},
-							  timestamp: (new Date().toISOString()),
-							  footer: {text: "Requested by " + e.message.author.username},
-							  fields: [
-							  
+								color: parseInt(e.mastergroup.colour),
+								author: {name: "Stats for " + info.profile.personaname, icon_url: info.profile.avatarmedium, url: "https://steamcommunity.com/profiles/" + info.profile.steamid},
+								timestamp: (new Date().toISOString()),
+								footer: {text: "Requested by " + e.message.author.username},
+								fields: [
+								
 								{name: (info.isShared ? "👪Family Shared" : "🕙Total Playtime"), value: (info.isShared ? "\u200B" : playtime), inline: true},
 								{name: "🏆Achievements", value: (info.payday.achievements ? numberWithCommas(info.payday.achievements.length) : 0), inline: true},
 								{name: "🥇Level", value: (info.infamy > 0 ? "**\\\u2660**" + infamyList[info.infamy-1] + "-" : "") + info.level, inline: true},
 						
 						
-							  	{name: "☠Total Kills", value: numberWithCommas(info.killCount), inline: true},
-							  	{name: "💰Heists Completed", value: numberWithCommas(info.heistSuccess + info.heistFail), inline: true},
-							  	{name: "🤡Heister", value: info.heister.name, inline: true},
-								  
-								  
+								{name: "☠Total Kills", value: numberWithCommas(info.killCount), inline: true},
+								{name: "💰Heists Completed", value: numberWithCommas(info.heistSuccess + info.heistFail), inline: true},
+								{name: "🤡Heister", value: info.heister.name, inline: true},
+									
+									
 								{name: "🔫Primary Weapon", value: info.primaryGun.fullName + " (" + info.primaryGun.kills + ")", inline: true},
 								empty,
 								{name: "🔫Secondary Gun", value: info.secondaryGun.fullName + " (" + info.secondaryGun.kills + ")", inline: true}
-							  ]
+								]
 							});
 							
 						}catch(e_){
@@ -157,7 +192,7 @@ function getStat(playerstats, stat){
 function numberWithCommas(x) {
 	if(!x)
 		return "0";
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 var infamyList = ["I", "II", "III", "IV", "V", "VI", 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV'];
