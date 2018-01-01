@@ -73,16 +73,18 @@ module.exports = {
 						request.post({
 							url: "http://fbi.overkillsoftware.com/datafeed/datafeed-modusoperandi.php",
 							form: {
-								steamid: steamAccount
+								steamid: steamAccount,
+								windowname: "fbiwindowspawn2" + Math.floor( (Math.random() * 8) + 1)
 							},
 							timeout: 5000
 						}, function(err, response, body) {
 							if(err || response.statusCode != 200) {
 								if(err && err.code == "ESOCKETTIMEDOUT"){
 									e.message.channel.sendMessage("Looks like the FBI systems are a bit slow, you should try again later.");
+									logger.error(err || response.statusCode);
 									return;
 								}
-								e.message.channel.sendMessage("Uh, looks like the FBI is having some problems.");
+								e.message.channel.sendMessage("Uh-oh, looks like the FBI is having some problems, try again later.");
 								logger.error(err || response.statusCode);
 								return;
 							}
@@ -112,22 +114,24 @@ module.exports = {
 								}
 							}
 
-							var steamName = $('.fbiwindowcontentboxinnertitle1')[0].innerText;
-							var heisterName = $('.fbimodusappearanceclick')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusappearanceclick')[0].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusappearanceclick')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusappearanceclick')[0].attribs.onclick.toString(), '\'', 3)+1).length-3);
+							var steamName = $('.fbiwindowcontentboxinnertitle1')[0].innerText || "Unknown";
+							var heisterName = $('.fbimodusappearanceclick')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusappearanceclick')[0].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusappearanceclick')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusappearanceclick')[0].attribs.onclick.toString(), '\'', 3)+1).length-3) || "Unknown";
 
-							var level = $('.fbimoduslevelcontainernumber')[0].children[0].data;
-							var infamy = $('.fbimoduslevelcontainernumber')[1].children[0].data;
-
-							var primaryWeapon = $('.fbimodusequipclickable')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[0].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[0].attribs.onclick.toString(), '\'', 3)+1).length-3);
-							var secondaryWeapon = $('.fbimodusequipclickable')[1].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[1].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[1].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[1].attribs.onclick.toString(), '\'', 3)+1).length-3);
-							var meleeWeapon = $('.fbimodusequipclickable')[2].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[2].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[2].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[2].attribs.onclick.toString(), '\'', 3)+1).length-3);
-							var throwableWeapon = $('.fbimodusequipclickable')[3].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[3].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[3].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[3].attribs.onclick.toString(), '\'', 3)+1).length-3);
+							var level = $('.fbimoduslevelcontainernumber')[0].children[0].data || "0";
+							var infamy = $('.fbimoduslevelcontainernumber')[1].children[0].data || "0";
+							var primaryWeapon = $('.fbimodusequipclickable')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[0].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[0].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[0].attribs.onclick.toString(), '\'', 3)+1).length-3) || "Unknown";
+							var secondaryWeapon = $('.fbimodusequipclickable')[1].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[1].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[1].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[1].attribs.onclick.toString(), '\'', 3)+1).length-3) || "Unknown";
+							var meleeWeapon = $('.fbimodusequipclickable')[2].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[2].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[2].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[2].attribs.onclick.toString(), '\'', 3)+1).length-3) || "Unknown";
+							var throwableWeapon = $('.fbimodusequipclickable')[3].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[3].attribs.onclick.toString(), '\'', 3)+1).substring(0,$('.fbimodusequipclickable')[3].attribs.onclick.toString().substring(nthIndex($('.fbimodusequipclickable')[3].attribs.onclick.toString(), '\'', 3)+1).length-3) || "Unknown";
 
 
 
 							e.message.channel.sendMessage("", false, {
-								color: parseInt(e.mastergroup.colour),
-								author: {name: "Stats for " + info.profile.personaname, icon_url: info.profile.avatarmedium, url: "https://steamcommunity.com/profiles/" + info.profile.steamid},
+								author: {
+									name: "Stats for " + info.profile.personaname, 
+									icon_url: info.profile.avatarmedium, 
+									url: "https://steamcommunity.com/profiles/" + info.profile.steamid
+								},
 								timestamp: (new Date().toISOString()),
 								footer: {text: "Requested by " + e.message.author.username},
 								fields: [
@@ -146,6 +150,10 @@ module.exports = {
 									{name: "🔫Secondary Weapon", value: secondaryWeapon, inline: true},
 									{name: "🗡Melee Weapon", value: meleeWeapon, inline: true}
 								]
+							}).catch((err, berr)=>{
+								logger.error(err);
+								console.log(err)
+								console.log(berr);
 							});
 
 
